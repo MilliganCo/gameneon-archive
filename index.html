@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neon Uprising</title>
+
+  <!-- Внешние библиотеки -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+
+  <!-- Шрифт и стили -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Полный UI -->
+  <div id="game-container">
+    <div id="ui">
+      <!-- Main Menu -->
+      <div id="main-menu" class="menu">
+        <h1 class="menu-title">NEON UPRISING</h1>
+        <button id="start-game" class="menu-button">START GAME</button>
+        <button id="settings"   class="menu-button">SETTINGS</button>
+        <button id="credits"    class="menu-button">CREDITS</button>
+        <button id="exit-game"  class="menu-button">EXIT</button>
+      </div>
+
+      <!-- Settings Menu -->
+      <div id="settings-menu" class="menu" style="display: none;">
+        <h1 class="menu-title">SETTINGS</h1>
+        <div class="menu-option">
+          <span>Volume:</span>
+          <input type="range" id="volume" min="0" max="100" value="50">
+        </div>
+        <div class="menu-option">
+            <span>Difficulty:</span>
+            <select id="difficulty">
+              <option value="easy">Easy</option>
+              <option value="normal" selected>Normal</option>
+              <option value="hard">Hard</option>
+              <option value="insane">Insane</option>
+            </select>
+          </div>
+          
+          <!-- BEGIN: Controls block -->
+          <div class="menu-option controls-list" style="flex-direction: column; align-items: flex-start;">
+            <span style="margin-bottom: 8px;">Controls:</span>
+            <ul style="list-style: none; padding: 0; margin: 0; color: #fff; font-size: 0.7rem; line-height: 1.4;">
+              <li>WASD — Move player</li>
+              <li>Mouse Left — Shoot / Basic Attack</li>
+              <li>Q / W / E / R — Skills 1–4</li>
+              <li>G — Use consumable item</li>
+              <li>ESC — Pause / Resume</li>
+            </ul>
+          </div>
+          <!-- END: Controls block -->
+        <button id="back-to-main" class="menu-button">BACK</button>
+      </div>
+
+      <!-- Credits Menu -->
+      <div id="credits-menu" class="menu" style="display: none;">
+        <h1 class="menu-title">CREDITS</h1>
+        <div style="color: #fff; text-align: center; margin-bottom: 20px;">
+          <p>Game created by</p>
+          <p style="color: #0ff; font-size: 1.5rem;">Cody August Milligan</p>
+          <p>Special thanks to:</p>
+          <p>Three.js</p>
+          <p>Tailwind CSS</p>
+          <p>Google Fonts</p>
+        </div>
+        <button id="credits-back" class="menu-button">BACK</button>
+      </div>
+
+      <!-- Class Select Menu -->
+      <div id="class-select-menu" class="menu" style="display: none;">
+        <h1 class="menu-title">SELECT YOUR CLASS</h1>
+        <div class="class-select">
+          <div class="class-option" data-class="technomage">
+            <h2 class="class-title">TECHNOMAGE</h2>
+            <p class="class-desc">Mixes magic and technology. High energy, low health. Specializes in ranged attacks and area effects.</p>
+          </div>
+          <div class="class-option" data-class="cyberberserk">
+            <h2 class="class-title">CYBER BERSERK</h2>
+            <p class="class-desc">Augmented melee fighter. High health, low energy. Excels in close combat and taking damage.</p>
+          </div>
+          <div class="class-option" data-class="ludohacker">
+            <h2 class="class-title">LUDO HACKER</h2>
+            <p class="class-desc">Stealth and hacking specialist. Balanced stats. Can disable enemies and bypass obstacles.</p>
+          </div>
+        </div>
+        <button id="confirm-class" class="menu-button">CONFIRM SELECTION</button>
+        <button id="back-to-main-from-class" class="menu-button">BACK</button>
+      </div>
+
+      <!-- Pause Menu -->
+      <div id="pause-menu" class="menu" style="display: none;">
+        <h1 class="menu-title">GAME PAUSED</h1>
+        <button id="resume-game" class="menu-button">RESUME</button>
+        <button id="save-game"   class="menu-button">SAVE GAME</button>
+        <button id="load-game"   class="menu-button">LOAD GAME</button>
+        <button id="quit-to-menu"class="menu-button">QUIT TO MENU</button>
+      </div>
+
+      <!-- Shop Menu -->
+      <div id="shop-menu" class="menu" style="display: none;">
+        <h1 class="menu-title">NEON MARKET</h1>
+        <div id="shop-items"></div>
+        <div class="menu-option">
+          <span>Credits:</span>
+          <span id="shop-credits">0</span>
+        </div>
+        <button id="exit-shop" class="menu-button">EXIT SHOP</button>
+      </div>
+
+      <!-- Upgrade Menu -->
+      <div id="upgrade-menu" class="menu" style="display: none;">
+        <h1 class="menu-title">UPGRADES</h1>
+        <div id="upgrade-options"></div>
+        <div class="menu-option">
+          <span>Experience:</span>
+          <span id="upgrade-xp">0</span>
+        </div>
+        <button id="exit-upgrades" class="menu-button">EXIT UPGRADES</button>
+      </div>
+
+      <!-- HUD -->
+      <div id="hud" style="display: none;">
+        <div class="hud">
+          <div class="hud-item">HEALTH: <span id="health-value">100</span>/<span id="max-health">100</span></div>
+          <div class="health-bar"><div id="health-fill" class="health-fill"></div></div>
+          <div class="hud-item">ENERGY: <span id="energy-value">100</span>/<span id="max-energy">100</span></div>
+          <div class="energy-bar"><div id="energy-fill" class="energy-fill"></div></div>
+          <div class="hud-item">LEVEL: <span id="level">1</span></div>
+          <div class="hud-item">XP: <span id="xp">0</span>/<span id="next-level-xp">100</span></div>
+          <div class="hud-item">CREDITS: <span id="credits">0</span></div>
+          <div class="hud-item">KILLS: <span id="kills">0</span></div>
+          <div class="inventory">
+            <div id="inventory-weapon1" class="inventory-slot active">W1</div>
+            <div id="inventory-weapon2" class="inventory-slot">W2</div>
+            <div id="inventory-item"    class="inventory-slot">I</div>
+          </div>
+        </div>
+        <div class="crosshair"></div>
+        <div class="weapon-selector">
+          <div class="weapon-option active" data-weapon="1">1</div>
+          <div class="weapon-option" data-weapon="2">2</div>
+          <div class="weapon-option" data-weapon="item">I</div>
+        </div>
+        <div class="skill-selector">
+          <div class="skill-option" data-skill="1">Q</div>
+          <div class="skill-option" data-skill="2">E</div>
+          <div class="skill-option" data-skill="3">R</div>
+          <div class="skill-option" data-skill="4">F</div>
+        </div>
+        <div id="objective" class="objective">
+          <div id="objective-text">Objective: Kill all enemies or tag 5 graffiti spots</div>
+          <div id="enemies-remaining">Enemies remaining: 10</div>
+          <div id="graffiti-remaining">Graffiti remaining: 5</div>
+        </div>
+        <div id="graffiti-count" class="graffiti-count">
+          Graffiti: <span id="graffiti-done">0</span>/<span id="graffiti-total">5</span>
+        </div>
+      </div>
+
+      <!-- Notifications & Effects -->
+      <div id="notification" class="notification">Notification text</div>
+      <div id="damage-effect" class="damage-effect"></div>
+
+      <!-- Boss Health -->
+      <div id="boss-health" class="boss-health" style="display: none;">
+        <div id="boss-health-fill" class="boss-health-fill"></div>
+      </div>
+      <div id="boss-name" class="boss-name" style="display: none;">BOSS NAME</div>
+
+      <!-- Death Screen -->
+      <div id="death-screen" class="death-screen" style="display: none;">
+        <h1 class="death-title">YOU DIED</h1>
+        <div class="death-stats">
+          <p>Level reached: <span id="death-level">1</span></p>
+          <p>Enemies killed: <span id="death-kills">0</span></p>
+          <p>Credits earned: <span id="death-credits">0</span></p>
+        </div>
+        <button id="retry" class="menu-button">RETRY</button>
+        <button id="quit-after-death" class="menu-button">QUIT TO MENU</button>
+      </div>
+
+      <!-- Level Complete -->
+      <div id="level-complete" class="level-complete" style="display: none;">
+        <h1 class="level-title">LEVEL COMPLETE</h1>
+        <div class="level-stats">
+          <p>Enemies killed: <span id="complete-kills">0</span></p>
+          <p>Credits earned: <span id="complete-credits">0</span></p>
+          <p>XP gained: <span id="complete-xp">0</span></p>
+        </div>
+        <button id="next-level" class="menu-button">NEXT LEVEL</button>
+        <button id="shop-button" class="menu-button">VISIT SHOP</button>
+        <button id="upgrade-button" class="menu-button">UPGRADE SKILLS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Логика игры -->
+  <script src="game.js" defer></script>
+  <script defer>
+    document.addEventListener('DOMContentLoaded', () => gameState.init());
+  </script>
+</body>
+</html>
