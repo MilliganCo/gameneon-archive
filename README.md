@@ -1,5 +1,7 @@
 # GameNeon
 
+> Public experimental source: see [PUBLICATION.md](PUBLICATION.md) for actual checks, known defects, restored modules and operational limits. Earlier audit decisions are historical.
+
 ## О проекте
 
 `GameNeon` — компактная браузерная мини-игра в неоновом стиле. Вся логика сосредоточена в трёх файлах, поэтому проект удобен как быстрый игровой прототип и как учебный пример простой web-игры без сборщиков и фреймворков.
